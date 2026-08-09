@@ -1,0 +1,15 @@
+dataset/
+*.parquet
+
+indobert_dana/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.pkl
+
+__pycache__/
+.ipynb_checkpoints/
+
+.venv/
+venv/
