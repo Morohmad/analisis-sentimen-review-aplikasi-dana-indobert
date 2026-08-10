@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analisis Sentimen Review DANA - IndoBERT</title>
+
+  <!-- Google Fonts & Phosphor Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Static CSS -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Brand DANA -->
+    <header class="app-header">
+      <div class="brand-logo-container">
+        <!-- SVG Vector Logo DANA -->
+        <svg class="dana-logo" viewBox="0 0 160 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22.5" cy="22.5" r="22.5" fill="#108EE9"/>
+          <path d="M16 15H24C27.866 15 31 18.134 31 22.5C31 26.866 27.866 30 24 30H16V15Z" stroke="white" stroke-width="4.5" stroke-linejoin="round"/>
+          <text x="52" y="31" fill="#108EE9" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="28" letter-spacing="0.5">DANA</text>
+        </svg>
+        <span class="badge-tag">AI Sentiment</span>
+      </div>
+      <p class="subtitle">Analisis sentimen ulasan pengguna aplikasi DANA berbasis model IndoBERT</p>
+    </header>
+
+    <!-- Card Input Teks -->
+    <main class="card">
+      <div class="form-group">
+        <label for="reviewInput">Teks Ulasan Pengguna</label>
+        <textarea 
+          id="reviewInput" 
+          placeholder="Contoh: Transaksi pakai DANA praktis banget buat bayar tagihan, tapi kadang pas mau transfer suka kendala koneksi..."
+          maxlength="500"></textarea>
+        <div class="char-counter"><span id="charCount">0</span>/500 karakter</div>
+      </div>
+
+      <button id="submitBtn">
+        <span id="btnText"><i class="ph-bold ph-magnifying-glass"></i> Analisis Sentimen</span>
+        <span id="btnSpinner" class="spinner hidden"></span>
+      </button>
+
+      <!-- Panel Hasil Analisis -->
+      <div id="resultPanel" class="result-panel hidden">
+        <div class="divider"></div>
+        
+        <div class="result-header">
+          <span class="label">Prediksi Sentimen</span>
+          <span id="sentimentBadge" class="badge">Positif</span>
+        </div>
+
+        <div class="confidence-box">
+          <div class="confidence-info">
+            <span>Tingkat Akurasi Prediksi</span>
+            <strong id="confidenceText">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      Powered by IndoBERT & FastAPI • DANA App Review Project
+    </footer>
+  </div>
+
+  <!-- Static JS -->
+  <script src="/static/script.js"></script>
+</body>
+</html>
