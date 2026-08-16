@@ -1,84 +1,70 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const textarea = document.getElementById("reviewInput");
-  const charCount = document.getElementById("charCount");
-  const submitBtn = document.getElementById("submitBtn");
-  const btnText = document.getElementById("btnText");
-  const btnSpinner = document.getElementById("btnSpinner");
-  const resultPanel = document.getElementById("resultPanel");
-  const sentimentBadge = document.getElementById("sentimentBadge");
-  const confidenceText = document.getElementById("confidenceText");
-  const progressBar = document.getElementById("progressBar");
+const reviewInput = document.getElementById("reviewInput");
+const charCount = document.getElementById("charCount");
+const submitBtn = document.getElementById("submitBtn");
+const btnText = document.getElementById("btnText");
+const btnSpinner = document.getElementById("btnSpinner");
+const resultPanel = document.getElementById("resultPanel");
+const sentimentBadge = document.getElementById("sentimentBadge");
+const confidenceText = document.getElementById("confidenceText");
+const progressBar = document.getElementById("progressBar");
 
-  // Hitung Karakter Input
-  textarea.addEventListener("input", () => {
-    charCount.textContent = textarea.value.length;
-  });
+reviewInput.addEventListener("input", () => {
+  const len = reviewInput.value.length;
+  charCount.textContent = len;
+});
 
-  // Event Listener Klik Tombol
-  submitBtn.addEventListener("click", analyzeSentiment);
+submitBtn.addEventListener("click", async () => {
+  const text = reviewInput.value.trim();
 
-  async function analyzeSentiment() {
-    const textInput = textarea.value.trim();
-
-    if (!textInput) {
-      alert("Silakan masukkan teks ulasan terlebih dahulu.");
-      return;
-    }
-
-    // Set UI State Loading
-    submitBtn.disabled = true;
-    btnText.classList.add("hidden");
-    btnSpinner.classList.remove("hidden");
-
-    try {
-      // Panggil endpoint /predict langsung di domain/port yang sama
-      const response = await fetch("/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: textInput })
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal mengambil respon dari API");
-      }
-
-      const data = await response.json();
-      const sentiment = data.sentiment;
-      const confidenceVal = parseFloat(data.confidence);
-
-      // Render Badge Sentimen
-      sentimentBadge.textContent = sentiment;
-      sentimentBadge.className = "badge " + getSentimentClass(sentiment);
-
-      // Render Progress Bar Keyakinan Model
-      confidenceText.textContent = `${confidenceVal}%`;
-      progressBar.style.width = `${confidenceVal}%`;
-      progressBar.className = "progress-bar-fill " + getBarClass(sentiment);
-
-      // Tampilkan Result Panel
-      resultPanel.classList.remove("hidden");
-
-    } catch (error) {
-      alert("Gagal terhubung ke API server.");
-    } finally {
-      // Restore UI State Button
-      submitBtn.disabled = false;
-      btnText.classList.remove("hidden");
-      btnSpinner.classList.add("hidden");
-    }
+  if (!text) {
+    alert("Silakan masukkan teks ulasan terlebih dahulu.");
+    reviewInput.focus();
+    return;
   }
 
-  function getSentimentClass(label) {
-    const l = label.toLowerCase();
-    if (l.includes("pos")) return "badge-positive";
-    if (l.includes("neg")) return "badge-negative";
-    return "badge-neutral";
-  }
+  submitBtn.disabled = true;
+  btnText.classList.add("hidden");
+  btnSpinner.classList.remove("hidden");
 
-  function getBarClass(label) {
-    const l = label.toLowerCase();
-    if (l.includes("pos")) return "bg-positive";
-    if (l.includes("neg")) return "bg-negative";
-    return "bg-neutral";
+  try {
+    const response = await fetch("/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text })
+    });
+
+    if (!response.ok) {
+      throw new Error("Prediksi gagal diproses");
+    }
+
+    const result = await response.json();
+
+    const sentiment = result.sentiment.toLowerCase();
+    const confidence = Number(result.confidence || 0);
+
+    sentimentBadge.textContent = result.sentiment;
+    sentimentBadge.classList.remove("positive", "negative", "neutral");
+
+    if (sentiment === "positif") {
+      sentimentBadge.classList.add("positive");
+    } else if (sentiment === "negatif") {
+      sentimentBadge.classList.add("negative");
+    } else {
+      sentimentBadge.classList.add("neutral");
+    }
+
+    confidenceText.textContent = `${confidence}%`;
+    progressBar.style.width = `${confidence}%`;
+
+    resultPanel.classList.remove("hidden");
+  } catch (error) {
+    alert("Terjadi kesalahan saat menganalisis. Silakan coba lagi.");
+    console.error(error);
+  } finally {
+    submitBtn.disabled = false;
+    btnSpinner.classList.add("hidden");
+    btnText.classList.remove("hidden");
   }
 });
